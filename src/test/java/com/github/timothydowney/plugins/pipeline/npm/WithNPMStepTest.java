@@ -36,6 +36,7 @@ public class WithNPMStepTest {
                 WorkflowJob p = story.j.createProject(WorkflowJob.class, "p");
                 p.setDefinition(new CpsFlowDefinition("node {withNPM(npmrcConfig: '" + createConfig().id + "') {sh 'cat .npmrc'}}", true));
                 WorkflowRun b = story.j.assertBuildStatusSuccess(p.scheduleBuild2(0));
+                story.j.assertLogContains("some content", b);
             }
         });
     }
