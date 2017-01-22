@@ -5,7 +5,7 @@ This plugin provides integration with Pipeline by configuring an NPM environment
 For example:
 ```
 withNPM(npmrcConfig: 'my-custom-nprc') {
-    // some block
+    sh 'npm install'
 }
 ```
 'my-custom-npmrc' is a config file that has been previously added to Jenkins via Managed Files.  Underneath, the custom `npmrc` file is being copied to the workspace where it will serve a local override for the build.  Nominally, npm would have allowed a command line mechanism to refer to an npmrc file, but for now, it does not appear to.
