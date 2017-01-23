@@ -11,3 +11,25 @@ withNPM(npmrcConfig: 'my-custom-nprc') {
 'my-custom-npmrc' is a config file that has been previously added to Jenkins via Managed Files.  Underneath, the custom `npmrc` file is being copied to the workspace where it will serve a local override for the build.  Nominally, npm would have allowed a command line mechanism to refer to an npmrc file, but for now, it does not appear to.
 
 This plugin requires a local installation of NPM on the agent or may be used via a docker step.
+
+Here's another example using Docker and [Pipeline Model Definition](https://github.com/jenkinsci/pipeline-model-definition-plugin/wiki/getting%20started):
+
+```
+stage('npm-build') {
+    agent {
+        docker {
+            image 'node:7.4'
+        }
+    }
+
+    steps {
+        echo "Branch is ${env.BRANCH_NAME}..."
+
+        withNPM(npmrcConfig:'my-custom-npmrc') {
+            echo "Performing npm build..."
+            sh 'npm install'
+        }
+    }
+}
+```
+
