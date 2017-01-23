@@ -60,9 +60,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
-    <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
+    <connection>scm:git:git://github.com/timothydowney/pipeline-npm-plugin</connection>
+    <developerConnection>scm:git:git@github.com:timothydowney/pipeline-npm-plugin.git</developerConnection>
+    <url>https://github.com/timothydowney/pipeline-npm-plugin</url>
     <tag>HEAD</tag>
   </scm>
 
