@@ -49,7 +49,7 @@ public class WithNPMStepTest {
             	createConfig();
                 WorkflowJob p = story.j.createProject(WorkflowJob.class, "p");
                 p.setDefinition(new CpsFlowDefinition("node {withNPM(npmrcConfig: 'missing') {sh 'cat .npmrc'}}", true));
-                WorkflowRun b = story.j.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
+                story.j.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
             }
         });
     }
