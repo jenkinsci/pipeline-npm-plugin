@@ -73,7 +73,7 @@ public class WithNPMStep extends Step {
         }
         
         @Restricted(NoExternalUse.class) // Only for UI calls
-        public ListBoxModel doFillNpmrcConfigItems(@AncestorInPath ItemGroup context) {
+        public ListBoxModel doFillNpmrcConfigItems(@AncestorInPath ItemGroup<?> context) {
             ListBoxModel r = new ListBoxModel();
             r.add("--- Choose an npmrc from custom config files ---",null);
             for (Config config : ConfigFiles.getConfigsInContext(context, CustomConfigProvider.class)) {
