@@ -26,6 +26,7 @@ package com.github.timothydowney.plugins.pipeline.npm;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,6 +36,7 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.lib.configprovider.ConfigProvider;
 import org.jenkinsci.lib.configprovider.model.Config;
 import org.jenkinsci.plugins.configfiles.ConfigFiles;
 import org.jenkinsci.plugins.workflow.steps.BodyExecution;
@@ -126,18 +128,20 @@ class WithNPMStepExecution extends StepExecution {
         if (StringUtils.isBlank(config.content)) {
             throw new AbortException("Could not create NPM config file id:" + settingsConfigId + ". Content of the file is empty");
         }
-        
+
         console.println("Using settings config with name " + config.name);
 
         try {
 	        if (settingsFile.exists()) {
 	        	console.println("A workscape local .npmrc already exists and will be overwrriten for the build.");
 	        }
-	        
-	        console.println("Contents of npmrc are: ");
-	        console.println(config.content);
-	        
-        	settingsFile.write(config.content, getComputer().getDefaultCharset().name());
+            ConfigProvider provider = config.getDescriptor();
+            ArrayList<String> tempFiles = new ArrayList<>();
+            String fileContent = provider.supplyContent(config, build, ws, listener, tempFiles);
+
+	        console.println("Writing .npmrc file: " + settingsFile);
+
+        	settingsFile.write(fileContent, getComputer().getDefaultCharset().name());
         } catch (Exception e) {
         	throw new IllegalStateException("The npmrc could not be supplied for the current build: " + e.getMessage(), e);
         }
