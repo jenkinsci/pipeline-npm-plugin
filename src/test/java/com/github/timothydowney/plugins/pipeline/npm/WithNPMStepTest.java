@@ -34,7 +34,7 @@ public class WithNPMStepTest {
             @Override
             public void evaluate() throws Throwable {
                 WorkflowJob p = story.j.createProject(WorkflowJob.class, "p");
-                p.setDefinition(new CpsFlowDefinition("node {withNPM(npmrcConfig: '" + createConfig().id + "') {sh 'cat .npmrc'}}", true));
+                p.setDefinition(new CpsFlowDefinition("node {withNPM(npmrcConfig: '" + createConfig().id + "') {echo(readFile('.npmrc'))}}", true));
                 WorkflowRun b = story.j.assertBuildStatusSuccess(p.scheduleBuild2(0));
                 story.j.assertLogContains("some content", b);
             }
@@ -48,7 +48,7 @@ public class WithNPMStepTest {
             public void evaluate() throws Throwable {
             	createConfig();
                 WorkflowJob p = story.j.createProject(WorkflowJob.class, "p");
-                p.setDefinition(new CpsFlowDefinition("node {withNPM(npmrcConfig: 'missing') {sh 'cat .npmrc'}}", true));
+                p.setDefinition(new CpsFlowDefinition("node {withNPM(npmrcConfig: 'missing') {echo(readFile('.npmrc'))}}", true));
                 story.j.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
             }
         });
