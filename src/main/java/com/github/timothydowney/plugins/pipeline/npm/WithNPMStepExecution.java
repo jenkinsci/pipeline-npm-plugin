@@ -33,7 +33,7 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.lib.configprovider.ConfigProvider;
@@ -194,13 +194,13 @@ class WithNPMStepExecution extends StepExecution {
      * @return the computer
      * @throws AbortException in case of error.
      */
-    private @Nonnull Computer getComputer() throws AbortException {
+    private @NonNull Computer getComputer() throws AbortException {
         if (computer != null) {
             return computer;
         }
 
         String node = null;
-        Jenkins j = Jenkins.getActiveInstance();
+        Jenkins j = Jenkins.get();
 
         for (Computer c : j.getComputers()) {
             if (c.getChannel() == launcher.getChannel()) {

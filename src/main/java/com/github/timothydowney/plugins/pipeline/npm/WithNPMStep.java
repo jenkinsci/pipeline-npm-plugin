@@ -17,6 +17,7 @@ import org.kohsuke.stapler.DataBoundSetter;
 
 import com.google.common.collect.ImmutableSet;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
@@ -26,6 +27,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.util.ListBoxModel;
 
+@SuppressFBWarnings(value="NP_NONNULL_PARAM_VIOLATION")
 public class WithNPMStep extends Step {
 
     private String npmrcConfig;
