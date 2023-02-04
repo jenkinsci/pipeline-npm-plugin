@@ -34,7 +34,7 @@
   </parent>
 
   <artifactId>pipeline-npm</artifactId>
-  <version>${revision}${changelist}</version>
+  <version>${changelist}</version>
   <packaging>hpi</packaging>
 
   <name>Pipeline NPM Integration Plugin</name>
@@ -63,8 +63,7 @@
   </scm>
 
   <properties>
-    <revision>0.9.3</revision>
-    <changelist>-SNAPSHOT</changelist>
+    <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/pipeline-npm-plugin</gitHubRepo>
     <jenkins.version>2.361.4</jenkins.version>
   </properties>
