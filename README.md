@@ -1,10 +1,10 @@
 # Pipeline NPM Plugin
 
 [![Build Status](https://ci.jenkins.io/job/Plugins/job/pipeline-npm-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/pipeline-npm-plugin/job/master/)
-[![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/openshift-k8s-credentials.svg)](https://plugins.jenkins.io/openshift-k8s-credentials)
+[![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/pipeline-npm.svg)](https://plugins.jenkins.io/pipeline-npm)
 [![GitHub release](https://img.shields.io/github/release/jenkinsci/pipeline-npm-plugin.svg?label=changelog)](https://github.com/jenkinsci/pipeline-npm-plugin/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/jenkinsci/pipeline-npm-plugin)](https://github.com/jenkinsci/pipeline-npm-plugin/blob/master/LICENSE.md)
-[![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/openshift-k8s-credentials.svg?color=blue)](https://plugins.jenkins.io/openshift-k8s-credentials)
+[![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/pipeline-npm.svg?color=blue)](https://plugins.jenkins.io/pipeline-npm)
 
 This plugin provides integration with Pipeline by configuring an NPM environment to use within a pipeline job by calling `sh npm` or `bat npm`.  This is accomplished by adding an `npmrc` as a custom config file to be centrally managed  by Jenkins.  This is useful for managing registries, authorizations, and any other npm settings that one would like to manage via Jenkins outside of the pipeline itself.
 
