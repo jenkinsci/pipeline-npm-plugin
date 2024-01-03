@@ -1,6 +1,8 @@
 # Pipeline NPM Plugin
 
 [![Build Status](https://ci.jenkins.io/job/Plugins/job/pipeline-npm-plugin/job/main/badge/icon)](https://ci.jenkins.io/job/Plugins/job/pipeline-npm-plugin/job/main/)
+[![Coverage](https://ci.jenkins.io/job/Plugins/job/pipeline-npm-plugin/job/main/badge/icon?status=${instructionCoverage}&subject=coverage&color=${colorInstructionCoverage})](https://ci.jenkins.io/job/Plugins/job/pipeline-npm-plugin/job/main)
+[![LOC](https://ci.jenkins.io/job/Plugins/job/pipeline-npm-plugin/job/main/badge/icon?job=test&status=${lineOfCode}&subject=line%20of%20code&color=blue)](https://ci.jenkins.io/job/Plugins/job/pipeline-npm-plugin/job/main)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/pipeline-npm.svg)](https://plugins.jenkins.io/pipeline-npm)
 [![GitHub release](https://img.shields.io/github/release/jenkinsci/pipeline-npm-plugin.svg?label=changelog)](https://github.com/jenkinsci/pipeline-npm-plugin/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/jenkinsci/pipeline-npm-plugin)](https://github.com/jenkinsci/pipeline-npm-plugin/blob/main/LICENSE.md)
