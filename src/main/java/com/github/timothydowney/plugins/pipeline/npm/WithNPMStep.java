@@ -1,7 +1,16 @@
 package com.github.timothydowney.plugins.pipeline.npm;
 
+import com.google.common.collect.ImmutableSet;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import hudson.EnvVars;
+import hudson.Extension;
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.model.ItemGroup;
+import hudson.model.Run;
+import hudson.model.TaskListener;
+import hudson.util.ListBoxModel;
 import java.util.Set;
-
 import org.jenkinsci.lib.configprovider.model.Config;
 import org.jenkinsci.plugins.configfiles.ConfigFiles;
 import org.jenkinsci.plugins.configfiles.custom.CustomConfig.CustomConfigProvider;
@@ -15,28 +24,14 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-import com.google.common.collect.ImmutableSet;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import hudson.EnvVars;
-import hudson.Extension;
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.ItemGroup;
-import hudson.model.Run;
-import hudson.model.TaskListener;
-import hudson.util.ListBoxModel;
-
-@SuppressFBWarnings(value="NP_NONNULL_PARAM_VIOLATION")
+@SuppressFBWarnings(value = "NP_NONNULL_PARAM_VIOLATION")
 public class WithNPMStep extends Step {
 
     private String npmrcConfig;
 
     @DataBoundConstructor
-    public WithNPMStep() {
-    }
+    public WithNPMStep() {}
 
-    
     public String getNpmrcConfig() {
         return npmrcConfig;
     }
@@ -73,17 +68,15 @@ public class WithNPMStep extends Step {
         public Set<Class<?>> getRequiredContext() {
             return ImmutableSet.of(TaskListener.class, FilePath.class, Launcher.class, EnvVars.class, Run.class);
         }
-        
+
         @Restricted(NoExternalUse.class) // Only for UI calls
         public ListBoxModel doFillNpmrcConfigItems(@AncestorInPath ItemGroup<?> context) {
             ListBoxModel r = new ListBoxModel();
-            r.add("--- Choose an npmrc from custom config files ---",null);
+            r.add("--- Choose an npmrc from custom config files ---", null);
             for (Config config : ConfigFiles.getConfigsInContext(context, CustomConfigProvider.class)) {
                 r.add(config.name, config.id);
             }
             return r;
         }
-
     }
-	
 }

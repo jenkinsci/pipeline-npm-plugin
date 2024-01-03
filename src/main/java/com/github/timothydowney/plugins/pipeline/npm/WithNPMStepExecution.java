@@ -24,6 +24,16 @@
 
 package com.github.timothydowney.plugins.pipeline.npm;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import hudson.AbortException;
+import hudson.EnvVars;
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.console.ConsoleLogFilter;
+import hudson.model.Computer;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -32,9 +42,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-
+import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.lib.configprovider.ConfigProvider;
 import org.jenkinsci.lib.configprovider.model.Config;
@@ -45,18 +53,9 @@ import org.jenkinsci.plugins.workflow.steps.EnvironmentExpander;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import hudson.AbortException;
-import hudson.EnvVars;
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.console.ConsoleLogFilter;
-import hudson.model.Computer;
-import hudson.model.Run;
-import hudson.model.TaskListener;
-import jenkins.model.Jenkins;
-
-@SuppressFBWarnings(value="SE_TRANSIENT_FIELD_NOT_RESTORED", justification="Contextual fields used only in start(); no onResume needed")
+@SuppressFBWarnings(
+        value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+        justification = "Contextual fields used only in start(); no onResume needed")
 class WithNPMStepExecution extends StepExecution {
 
     private static final long serialVersionUID = 1L;
@@ -101,11 +100,15 @@ class WithNPMStepExecution extends StepExecution {
         settingsFromConfig(step.getNpmrcConfig(), ws.child(".npmrc"));
 
         ConsoleLogFilter consFilter = getContext().get(ConsoleLogFilter.class);
-        EnvironmentExpander envEx = EnvironmentExpander.merge(getContext().get(EnvironmentExpander.class), 
-        		new ExpanderImpl(envOverride));
+        EnvironmentExpander envEx =
+                EnvironmentExpander.merge(getContext().get(EnvironmentExpander.class), new ExpanderImpl(envOverride));
 
         // TODO:  Without the callback, this hangs....not clear why
-        body = getContext().newBodyInvoker().withContexts(envEx, consFilter).withCallback(new Callback()).start();
+        body = getContext()
+                .newBodyInvoker()
+                .withContexts(envEx, consFilter)
+                .withCallback(new Callback())
+                .start();
 
         return false;
     }
@@ -113,7 +116,7 @@ class WithNPMStepExecution extends StepExecution {
     /**
      * Reads the config file from Config File Provider, expands the credentials and stores it in a file on the temp
      * folder to use it with the maven wrapper script
-     * 
+     *
      * @param settingsConfigId config file id from Config File Provider
      * @param settingsFile path to write te content to
      * @return the {@link FilePath} to the settings file
@@ -123,27 +126,30 @@ class WithNPMStepExecution extends StepExecution {
 
         Config config = ConfigFiles.getByIdOrNull(build, settingsConfigId);
         if (config == null) {
-            throw new AbortException("Could not find the NPM config file id:" + settingsConfigId + ". Make sure it exists on Managed Files");
+            throw new AbortException("Could not find the NPM config file id:" + settingsConfigId
+                    + ". Make sure it exists on Managed Files");
         }
         if (StringUtils.isBlank(config.content)) {
-            throw new AbortException("Could not create NPM config file id:" + settingsConfigId + ". Content of the file is empty");
+            throw new AbortException(
+                    "Could not create NPM config file id:" + settingsConfigId + ". Content of the file is empty");
         }
 
         console.println("Using settings config with name " + config.name);
 
         try {
-	        if (settingsFile.exists()) {
-	        	console.println("A workscape local .npmrc already exists and will be overwrriten for the build.");
-	        }
+            if (settingsFile.exists()) {
+                console.println("A workscape local .npmrc already exists and will be overwrriten for the build.");
+            }
             ConfigProvider provider = config.getDescriptor();
             ArrayList<String> tempFiles = new ArrayList<>();
             String fileContent = provider.supplyContent(config, build, ws, listener, tempFiles);
 
-	        console.println("Writing .npmrc file: " + settingsFile);
+            console.println("Writing .npmrc file: " + settingsFile);
 
-        	settingsFile.write(fileContent, getComputer().getDefaultCharset().name());
+            settingsFile.write(fileContent, getComputer().getDefaultCharset().name());
         } catch (Exception e) {
-        	throw new IllegalStateException("The npmrc could not be supplied for the current build: " + e.getMessage(), e);
+            throw new IllegalStateException(
+                    "The npmrc could not be supplied for the current build: " + e.getMessage(), e);
         }
     }
 
@@ -175,7 +181,7 @@ class WithNPMStepExecution extends StepExecution {
 
         @Override
         protected void finished(StepContext context) throws Exception {
-        	// nothing
+            // nothing
         }
 
         private static final long serialVersionUID = 1L;
@@ -190,7 +196,7 @@ class WithNPMStepExecution extends StepExecution {
 
     /**
      * Gets the computer for the current launcher.
-     * 
+     *
      * @return the computer
      * @throws AbortException in case of error.
      */
@@ -222,10 +228,9 @@ class WithNPMStepExecution extends StepExecution {
             LOGGER.log(Level.FINE, "Computer: {0}", computer.getName());
             try {
                 LOGGER.log(Level.FINE, "Env: {0}", computer.getEnvironment());
-            } catch (IOException | InterruptedException e) {// ignored
+            } catch (IOException | InterruptedException e) { // ignored
             }
         }
         return computer;
     }
-
 }
