@@ -1,5 +1,6 @@
 package com.github.timothydowney.plugins.pipeline.npm;
 
+import hudson.model.Result;
 import org.jenkinsci.lib.configprovider.ConfigProvider;
 import org.jenkinsci.lib.configprovider.model.Config;
 import org.jenkinsci.plugins.configfiles.GlobalConfigFiles;
@@ -12,8 +13,6 @@ import org.junit.Test;
 import org.junit.runners.model.Statement;
 import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.RestartableJenkinsRule;
-
-import hudson.model.Result;
 
 /**
  * Unit tests for WithNPMStep
@@ -34,7 +33,8 @@ public class WithNPMStepTest {
             @Override
             public void evaluate() throws Throwable {
                 WorkflowJob p = story.j.createProject(WorkflowJob.class, "p");
-                p.setDefinition(new CpsFlowDefinition("node {withNPM(npmrcConfig: '" + createConfig().id + "') {echo(readFile('.npmrc'))}}", true));
+                p.setDefinition(new CpsFlowDefinition(
+                        "node {withNPM(npmrcConfig: '" + createConfig().id + "') {echo(readFile('.npmrc'))}}", true));
                 WorkflowRun b = story.j.assertBuildStatusSuccess(p.scheduleBuild2(0));
                 story.j.assertLogContains("some content", b);
             }
@@ -46,21 +46,24 @@ public class WithNPMStepTest {
         story.addStep(new Statement() {
             @Override
             public void evaluate() throws Throwable {
-            	createConfig();
+                createConfig();
                 WorkflowJob p = story.j.createProject(WorkflowJob.class, "p");
-                p.setDefinition(new CpsFlowDefinition("node {withNPM(npmrcConfig: 'missing') {echo(readFile('.npmrc'))}}", true));
+                p.setDefinition(new CpsFlowDefinition(
+                        "node {withNPM(npmrcConfig: 'missing') {echo(readFile('.npmrc'))}}", true));
                 story.j.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
             }
         });
     }
-    
+
     public Config createConfig() {
-        ConfigProvider configProvider = story.j.jenkins.getExtensionList(ConfigProvider.class).get(CustomConfig.CustomConfigProvider.class);
+        ConfigProvider configProvider =
+                story.j.jenkins.getExtensionList(ConfigProvider.class).get(CustomConfig.CustomConfigProvider.class);
         String id = configProvider.getProviderId() + "my-npmrc";
         Config config = new CustomConfig(id, "My File", "", "some content");
 
-        GlobalConfigFiles globalConfigFiles = story.j.jenkins.getExtensionList(GlobalConfigFiles.class).get(GlobalConfigFiles.class);
+        GlobalConfigFiles globalConfigFiles =
+                story.j.jenkins.getExtensionList(GlobalConfigFiles.class).get(GlobalConfigFiles.class);
         globalConfigFiles.save(config);
         return config;
-    }    
+    }
 }
