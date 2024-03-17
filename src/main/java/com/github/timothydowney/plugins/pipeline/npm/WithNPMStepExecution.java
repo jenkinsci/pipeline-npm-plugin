@@ -130,7 +130,7 @@ class WithNPMStepExecution extends StepExecution {
         }
 
         // Check if the content is blank and if authentication is not set, throw an exception
-        if (StringUtils.isBlank(config.content) && !isAuthenticationSet()) {
+        if (StringUtils.isBlank(config.content)) {
             throw new AbortException(
                     "The NPM config file is empty and no authentication is set. At least one authentication must be set for an empty config.");
         }
@@ -156,37 +156,7 @@ class WithNPMStepExecution extends StepExecution {
 
     // Placeholder for the method that checks if at least one authentication is set
     // This method needs to be implemented based on how authentication settings are managed in your application
-    private boolean isAuthenticationSet() {
-
-        boolean isAuthInEnv = checkAuthenticationInEnvironmentVariables();
-
-        boolean isAuthInNpmrc = checkAuthenticationInNpmrcFile();
-
-        return isAuthInEnv || isAuthInNpmrc;
-    }
-
-    private boolean checkAuthenticationInEnvironmentVariables() {
-        // Assuming there's an environment variable named NPM_AUTH_TOKEN
-        String authToken = System.getenv("NPM_AUTH_TOKEN");
-        return authToken != null && !authToken.isEmpty();
-    }
-
-    private boolean checkAuthenticationInNpmrcFile() {
-        // This is a simplified example. You'll need to adjust the logic based on how your .npmrc file is structured.
-        // Assuming the .npmrc file is located in the workspace root
-        FilePath npmrcFile = new FilePath(ws, ".npmrc");
-        try {
-            if (npmrcFile.exists()) {
-                String content = npmrcFile.readToString();
-                // Check for a placeholder or pattern that represents an authentication token
-                // Adjust the pattern based on your actual token format
-                return content.contains("${AUTH_TOKEN}");
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Failed to read .npmrc file for authentication check.", e);
-        }
-        return false;
-    }
+    
     /**
      * Takes care of overriding the environment with our defined overrides
      */
