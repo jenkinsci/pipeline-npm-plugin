@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
  ~ The MIT License
  ~
@@ -21,111 +21,207 @@
  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  ~ THE SOFTWARE.
- -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+ --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
   <modelVersion>4.0.0</modelVersion>
-
+    
   <parent>
+        
     <groupId>org.jenkins-ci.plugins</groupId>
+        
     <artifactId>plugin</artifactId>
+        
     <version>4.79</version>
-    <relativePath />
+        
+    <relativePath/>
+      
   </parent>
-
+    
   <artifactId>pipeline-npm</artifactId>
+    
   <version>${changelist}</version>
-  <packaging>hpi</packaging>
+     
+  <packaging>pom</packaging>
+     
 
+  
   <name>Pipeline NPM Integration Plugin</name>
+    
   <url>https://plugins.jenkins.io/pipeline-npm/</url>
+    
   <licenses>
+        
     <license>
+            
       <name>The MIT license</name>
+            
       <url>http://www.opensource.org/licenses/mit-license.php</url>
+            
       <distribution>repo</distribution>
+          
     </license>
+      
   </licenses>
-
+    
   <developers>
+        
     <developer>
+            
       <id>timdowney</id>
+            
       <name>Tim Downey</name>
+            
       <email>timothy.downey@gmail.com</email>
+          
     </developer>
+      
   </developers>
-
+    
   <scm>
+        
     <connection>scm:git:https://github.com/${gitHubRepo}</connection>
+        
     <developerConnection>scm:git:https@github.com:${gitHubRepo}.git</developerConnection>
+        
     <tag>${scmTag}</tag>
+        
     <url>https://github.com/${gitHubRepo}</url>
+      
   </scm>
-
+    
   <properties>
+        
     <changelist>999999-SNAPSHOT</changelist>
+        
     <gitHubRepo>jenkinsci/pipeline-npm-plugin</gitHubRepo>
+        
     <jenkins.version>2.426.3</jenkins.version>
+        
     <spotless.check.skip>false</spotless.check.skip>
+      
   </properties>
+    
   <dependencyManagement>
+        
     <dependencies>
+            
       <dependency>
+                
         <groupId>io.jenkins.tools.bom</groupId>
+                
         <artifactId>bom-2.426.x</artifactId>
+                
         <version>2907.vcb_35d6f2f7de</version>
+                
         <type>pom</type>
+                
         <scope>import</scope>
+              
       </dependency>
+          
     </dependencies>
+      
   </dependencyManagement>
+    
   <dependencies>
+        
     <dependency>
+            
       <groupId>org.jenkins-ci.plugins</groupId>
+            
       <artifactId>config-file-provider</artifactId>
+          
     </dependency>
+        
     <dependency>
+            
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            
       <artifactId>workflow-step-api</artifactId>
+          
     </dependency>
+        
     <dependency>
+            
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            
       <artifactId>workflow-basic-steps</artifactId>
+            
       <scope>test</scope>
+          
     </dependency>
+        
     <dependency>
+            
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            
       <artifactId>workflow-cps</artifactId>
+            
       <scope>test</scope>
+          
     </dependency>
+        
     <dependency>
+            
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            
       <artifactId>workflow-durable-task-step</artifactId>
+            
       <scope>test</scope>
+          
     </dependency>
+        
     <dependency>
+            
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            
       <artifactId>workflow-job</artifactId>
+            
       <scope>test</scope>
+          
     </dependency>
+        
     <dependency>
+            
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            
       <artifactId>workflow-support</artifactId>
+            
       <classifier>tests</classifier>
+            
       <scope>test</scope>
+          
     </dependency>
+      
   </dependencies>
-
+    
   <repositories>
+        
     <repository>
+            
       <id>repo.jenkins-ci.org</id>
+            
       <url>https://repo.jenkins-ci.org/public/</url>
+          
     </repository>
+      
   </repositories>
-
+    
   <pluginRepositories>
+        
     <pluginRepository>
+            
       <id>repo.jenkins-ci.org</id>
+            
       <url>https://repo.jenkins-ci.org/public/</url>
+          
     </pluginRepository>
+      
   </pluginRepositories>
+  
+  <modules>
+      
+    <module>new-module</module>
+      
+  </modules>
 </project>
