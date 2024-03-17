@@ -157,13 +157,11 @@ class WithNPMStepExecution extends StepExecution {
     // Placeholder for the method that checks if at least one authentication is set
     // This method needs to be implemented based on how authentication settings are managed in your application
     private boolean isAuthenticationSet() {
-       
+
         boolean isAuthInEnv = checkAuthenticationInEnvironmentVariables();
 
-        
         boolean isAuthInNpmrc = checkAuthenticationInNpmrcFile();
 
-        
         return isAuthInEnv || isAuthInNpmrc;
     }
 
