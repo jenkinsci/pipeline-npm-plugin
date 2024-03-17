@@ -163,7 +163,7 @@ class WithNPMStepExecution extends StepExecution {
         
         boolean isAuthInNpmrc = checkAuthenticationInNpmrcFile();
 
-        // Return true if authentication is found in either environment variables or .npmrc file
+        
         return isAuthInEnv || isAuthInNpmrc;
     }
 
