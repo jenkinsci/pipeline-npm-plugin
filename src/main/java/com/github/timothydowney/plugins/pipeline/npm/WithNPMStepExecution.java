@@ -161,7 +161,7 @@ class WithNPMStepExecution extends StepExecution {
 
         private ExpanderImpl(EnvVars overrides) {
             LOGGER.log(Level.FINE, "Overrides: " + overrides.toString());
-            this.overrides = new HashMap<>();
+            this.overrides = new HashMap<String, String>();
             for (Entry<String, String> entry : overrides.entrySet()) {
                 this.overrides.put(entry.getKey(), entry.getValue());
             }
