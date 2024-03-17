@@ -130,7 +130,7 @@ class WithNPMStepExecution extends StepExecution {
         }
 
         // Check if the content is blank and if authentication is not set, throw an exception
-        if (StringUtils.isBlank(config.content) && !isAuthenticationSet()) {
+        if (StringUtils.isBlank(config.content)) {
             throw new AbortException(
                     "The NPM config file is empty and no authentication is set. At least one authentication must be set for an empty config.");
         }
@@ -156,6 +156,7 @@ class WithNPMStepExecution extends StepExecution {
 
     // Placeholder for the method that checks if at least one authentication is set
     // This method needs to be implemented based on how authentication settings are managed in your application
+<<<<<<< HEAD
     private boolean isAuthenticationSet() {
 
         boolean isAuthInEnv = checkAuthenticationInEnvironmentVariables();
@@ -187,6 +188,9 @@ class WithNPMStepExecution extends StepExecution {
         }
         return false;
     }
+=======
+    
+>>>>>>> 1f79539bbb6b483f33b0fcb06fed7751dce78fc7
     /**
      * Takes care of overriding the environment with our defined overrides
      */
