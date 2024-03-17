@@ -77,6 +77,7 @@
      WithNPMStepExecution(StepContext context, WithNPMStep step) throws Exception {
          super(context);
          this.step = step;
+         // Or just delete these fields and inline:
          listener = context.get(TaskListener.class);
          ws = context.get(FilePath.class);
          launcher = context.get(Launcher.class);
@@ -93,13 +94,16 @@
          }
  
          getComputer();
- 
+         
+         // Create the .npmrc in the workspace so that it overrides the
+        // user or global .npmrc
          settingsFromConfig(step.getNpmrcConfig(), ws.child(".npmrc"));
  
          ConsoleLogFilter consFilter = getContext().get(ConsoleLogFilter.class);
          EnvironmentExpander envEx =
                  EnvironmentExpander.merge(getContext().get(EnvironmentExpander.class), new ExpanderImpl(envOverride));
  
+         // TODO:  Without the callback, this hangs....not clear why        
          body = getContext()
                  .newBodyInvoker()
                  .withContexts(envEx, consFilter)
@@ -108,6 +112,16 @@
  
          return false;
      }
+    /**
+     * Reads the config file from Config File Provider, expands the credentials and stores it in a file on the temp
+     * folder to use it with the maven wrapper script
+     *
+     * @param settingsConfigId config file id from Config File Provider
+     * @param settingsFile path to write te content to
+     * @return the {@link FilePath} to the settings file
+     * @throws AbortException in case of error
+     */
+
  
      private void settingsFromConfig(String settingsConfigId, FilePath settingsFile) throws AbortException {
          Config config = ConfigFiles.getByIdOrNull(build, settingsConfigId);
@@ -118,7 +132,7 @@
  
          if (StringUtils.isBlank(config.content)) {
              console.println("Warning: The NPM config file is empty. Proceeding without it.");
-             return; 
+             return; //allow empty files
          }
  
          console.println("Using settings config with name " + config.name);
@@ -142,7 +156,9 @@
  
  
  }
- 
+    /**
+     * Takes care of overriding the environment with our defined overrides
+     */
  private static final class ExpanderImpl extends EnvironmentExpander {
      private static final long serialVersionUID = 1;
      private final Map<String, String> overrides;
@@ -160,7 +176,9 @@
          env.overrideAll(overrides);
      }
  }
- 
+    /**
+     * Callback to cleanup tmp script after finishing the job
+     */
  private static class Callback extends BodyExecutionCallback.TailCall {
  
      @Override
@@ -177,6 +195,12 @@
          body.cancel(cause);
      }
  }
+    /**
+     * Gets the computer for the current launcher.
+     *
+     * @return the computer
+     * @throws AbortException in case of error.
+     */
  
  private @NonNull Computer getComputer() throws AbortException {
      if (computer != null) {
