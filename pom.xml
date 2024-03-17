@@ -67,6 +67,25 @@
     <jenkins.version>2.426.3</jenkins.version>
     <spotless.check.skip>false</spotless.check.skip>
   </properties>
+  <build>
+    <plugins>
+      
+        <plugin>
+            <groupId>com.diffplug.spotless</groupId>
+            <artifactId>spotless-maven-plugin</artifactId>
+            <version>2.17.4</version> 
+            <configuration>
+               
+                <java>
+                   
+                    <googleJavaFormat>
+                        <version>1.9</version>
+                    </googleJavaFormat>
+                </java>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
   <dependencyManagement>
     <dependencies>
       <dependency>
