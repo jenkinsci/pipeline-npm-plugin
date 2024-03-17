@@ -123,22 +123,23 @@ class WithNPMStepExecution extends StepExecution {
      * @throws AbortException in case of error
      */
     private void settingsFromConfig(String settingsConfigId, FilePath settingsFile) throws AbortException {
-
         Config config = ConfigFiles.getByIdOrNull(build, settingsConfigId);
         if (config == null) {
             throw new AbortException("Could not find the NPM config file id:" + settingsConfigId
                     + ". Make sure it exists on Managed Files");
         }
-        if (StringUtils.isBlank(config.content)) {
+
+        // Check if the content is blank and if authentication is not set, throw an exception
+        if (StringUtils.isBlank(config.content) && !isAuthenticationSet()) {
             throw new AbortException(
-                    "Could not create NPM config file id:" + settingsConfigId + ". Content of the file is empty");
+                    "The NPM config file is empty and no authentication is set. At least one authentication must be set for an empty config.");
         }
 
         console.println("Using settings config with name " + config.name);
 
         try {
             if (settingsFile.exists()) {
-                console.println("A workscape local .npmrc already exists and will be overwrriten for the build.");
+                console.println("A workspace local .npmrc already exists and will be overwritten for the build.");
             }
             ConfigProvider provider = config.getDescriptor();
             ArrayList<String> tempFiles = new ArrayList<>();
@@ -153,6 +154,41 @@ class WithNPMStepExecution extends StepExecution {
         }
     }
 
+    // Placeholder for the method that checks if at least one authentication is set
+// This method needs to be implemented based on how authentication settings are managed in your application
+    private boolean isAuthenticationSet() {
+        // Example: Check environment variables for authentication
+        boolean isAuthInEnv = checkAuthenticationInEnvironmentVariables();
+
+        // Example: Check .npmrc file for authentication placeholders
+        boolean isAuthInNpmrc = checkAuthenticationInNpmrcFile();
+
+        // Return true if authentication is found in either environment variables or .npmrc file
+        return isAuthInEnv || isAuthInNpmrc;
+    }
+
+    private boolean checkAuthenticationInEnvironmentVariables() {
+        // Assuming there's an environment variable named NPM_AUTH_TOKEN
+        String authToken = System.getenv("NPM_AUTH_TOKEN");
+        return authToken != null && !authToken.isEmpty();
+    }
+
+    private boolean checkAuthenticationInNpmrcFile() {
+        // This is a simplified example. You'll need to adjust the logic based on how your .npmrc file is structured.
+        // Assuming the .npmrc file is located in the workspace root
+        FilePath npmrcFile = new FilePath(ws, ".npmrc");
+        try {
+            if (npmrcFile.exists()) {
+                String content = npmrcFile.readToString();
+                // Check for a placeholder or pattern that represents an authentication token
+                // Adjust the pattern based on your actual token format
+                return content.contains("${AUTH_TOKEN}");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Failed to read .npmrc file for authentication check.", e);
+        }
+        return false;
+    }
     /**
      * Takes care of overriding the environment with our defined overrides
      */
