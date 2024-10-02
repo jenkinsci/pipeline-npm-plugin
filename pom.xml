@@ -64,14 +64,14 @@
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/pipeline-npm-plugin</gitHubRepo>
-    <jenkins.version>2.452.3</jenkins.version>
+    <jenkins.version>2.462.2</jenkins.version>
     <spotless.check.skip>false</spotless.check.skip>
   </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.452.x</artifactId>
+        <artifactId>bom-2.462.x</artifactId>
         <version>3413.v0d896b_76a_30d</version>
         <type>pom</type>
         <scope>import</scope>
