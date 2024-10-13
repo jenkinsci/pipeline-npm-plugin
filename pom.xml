@@ -45,15 +45,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
-  <developers>
-    <developer>
-      <id>timdowney</id>
-      <name>Tim Downey</name>
-      <email>timothy.downey@gmail.com</email>
-    </developer>
-  </developers>
-
   <scm>
     <connection>scm:git:https://github.com/${gitHubRepo}</connection>
     <developerConnection>scm:git:https@github.com:${gitHubRepo}.git</developerConnection>
@@ -64,14 +55,15 @@
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/pipeline-npm-plugin</gitHubRepo>
-    <jenkins.version>2.462.3</jenkins.version>
+    <jenkins.baseline>2.462</jenkins.baseline>
+    <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <spotless.check.skip>false</spotless.check.skip>
   </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.462.x</artifactId>
+        <artifactId>bom-${jenkins.baseline}.x</artifactId>
         <version>3482.vc10d4f6da_28a_</version>
         <type>pom</type>
         <scope>import</scope>
