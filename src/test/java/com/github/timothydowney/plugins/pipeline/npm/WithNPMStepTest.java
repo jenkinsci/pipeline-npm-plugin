@@ -8,61 +8,44 @@ import org.jenkinsci.plugins.configfiles.custom.CustomConfig;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.model.Statement;
-import org.jvnet.hudson.test.BuildWatcher;
-import org.jvnet.hudson.test.RestartableJenkinsRule;
+import org.junit.jupiter.api.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 /**
  * Unit tests for WithNPMStep
  * @author downeyt
  *
  */
-public class WithNPMStepTest {
-
-    @Rule
-    public BuildWatcher buildWatcher = new BuildWatcher();
-
-    @Rule
-    public RestartableJenkinsRule story = new RestartableJenkinsRule();
+@WithJenkins
+class WithNPMStepTest {
 
     @Test
-    public void testWithNPM() throws Exception {
-        story.addStep(new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                WorkflowJob p = story.j.createProject(WorkflowJob.class, "p");
-                p.setDefinition(new CpsFlowDefinition(
-                        "node {withNPM(npmrcConfig: '" + createConfig().id + "') {echo(readFile('.npmrc'))}}", true));
-                WorkflowRun b = story.j.assertBuildStatusSuccess(p.scheduleBuild2(0));
-                story.j.assertLogContains("some content", b);
-            }
-        });
+    void testWithNPM(JenkinsRule rule) throws Exception {
+        WorkflowJob p = rule.createProject(WorkflowJob.class, "p");
+        p.setDefinition(new CpsFlowDefinition(
+                "node {withNPM(npmrcConfig: '" + createConfig(rule).id + "') {echo(readFile('.npmrc'))}}", true));
+        WorkflowRun b = rule.assertBuildStatusSuccess(p.scheduleBuild2(0));
+        rule.assertLogContains("some content", b);
     }
 
     @Test
-    public void testWithNPMMissingNpmrc() throws Exception {
-        story.addStep(new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                createConfig();
-                WorkflowJob p = story.j.createProject(WorkflowJob.class, "p");
-                p.setDefinition(new CpsFlowDefinition(
-                        "node {withNPM(npmrcConfig: 'missing') {echo(readFile('.npmrc'))}}", true));
-                story.j.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
-            }
-        });
+    void testWithNPMMissingNpmrc(JenkinsRule rule) throws Exception {
+        createConfig(rule);
+        WorkflowJob p = rule.createProject(WorkflowJob.class, "p");
+        p.setDefinition(
+                new CpsFlowDefinition("node {withNPM(npmrcConfig: 'missing') {echo(readFile('.npmrc'))}}", true));
+        rule.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
     }
 
-    public Config createConfig() {
+    private Config createConfig(JenkinsRule rule) {
         ConfigProvider configProvider =
-                story.j.jenkins.getExtensionList(ConfigProvider.class).get(CustomConfig.CustomConfigProvider.class);
+                rule.jenkins.getExtensionList(ConfigProvider.class).get(CustomConfig.CustomConfigProvider.class);
         String id = configProvider.getProviderId() + "my-npmrc";
         Config config = new CustomConfig(id, "My File", "", "some content");
 
         GlobalConfigFiles globalConfigFiles =
-                story.j.jenkins.getExtensionList(GlobalConfigFiles.class).get(GlobalConfigFiles.class);
+                rule.jenkins.getExtensionList(GlobalConfigFiles.class).get(GlobalConfigFiles.class);
         globalConfigFiles.save(config);
         return config;
     }
