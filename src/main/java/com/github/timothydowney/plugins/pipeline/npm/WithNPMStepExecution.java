@@ -129,9 +129,22 @@ class WithNPMStepExecution extends StepExecution {
             throw new AbortException("Could not find the NPM config file id:" + settingsConfigId
                     + ". Make sure it exists on Managed Files");
         }
-        if (StringUtils.isBlank(config.content)) {
+        // if (StringUtils.isBlank(config.content)) {
+        //     throw new AbortException(
+        //             "Could not create NPM config file id:" + settingsConfigId + ". Content of the file is empty");
+        // }
+
+        if (StringUtils.isBlank(config.content) && !hasAuth(config)) {
             throw new AbortException(
-                    "Could not create NPM config file id:" + settingsConfigId + ". Content of the file is empty");
+                "Could not create NPM config file id:" + settingsConfigId + 
+                ". Content of the file is empty and no authentication provided"
+            );
+        }
+
+        // Helper method
+        private boolean hasAuth(Config config) {
+            return (config.authToken != null && !config.authToken.isEmpty()) 
+                || (config.credentialsId != null && !config.credentialsId.isEmpty());
         }
 
         console.println("Using settings config with name " + config.name);
