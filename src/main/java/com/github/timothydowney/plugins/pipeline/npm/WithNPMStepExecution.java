@@ -95,54 +95,85 @@ class WithNPMStepExecution extends StepExecution {
 
         getComputer();
 
-        // Create the .npmrc in the workspace so that it overrides the
-        // user or global .npmrc
-        settingsFromConfig(step.getNpmrcConfig(), ws.child(".npmrc"));
+        FilePath targetDir = ws;
+        if (StringUtils.isNotBlank(step.getPath())) {
+            targetDir = ws.child(step.getPath().trim());
+            targetDir.mkdirs();
+        }
+        FilePath settingsFile = targetDir.child(".npmrc");
+        ArrayList<String> tempFiles = new ArrayList<>();
+        boolean originalExisted = settingsFile.exists();
+        FilePath backupFile = null;
+
+        try {
+            if (originalExisted) {
+                backupFile = targetDir.child(".npmrc.bak." + System.currentTimeMillis());
+                settingsFile.copyTo(backupFile);
+                console.println("A workspace local .npmrc already exists and was backed up to " + backupFile.getName()
+                        + " for the duration of the build.");
+            }
+
+            settingsFromConfig(step.getNpmrcConfig(), settingsFile, tempFiles);
+        } catch (Exception e) {
+            if (originalExisted && backupFile != null) {
+                try {
+                    if (backupFile.exists()) {
+                        backupFile.copyTo(settingsFile);
+                        backupFile.delete();
+                    }
+                } catch (Exception restoreEx) { // ignored
+                }
+            } else if (!originalExisted) {
+                try {
+                    if (settingsFile.exists()) {
+                        settingsFile.delete();
+                    }
+                } catch (Exception deleteEx) { // ignored
+                }
+            }
+            throw e;
+        }
+
+        envOverride.put("NPM_CONFIG_USERCONFIG", settingsFile.getRemote());
 
         ConsoleLogFilter consFilter = getContext().get(ConsoleLogFilter.class);
         EnvironmentExpander envEx =
                 EnvironmentExpander.merge(getContext().get(EnvironmentExpander.class), new ExpanderImpl(envOverride));
 
-        // TODO:  Without the callback, this hangs....not clear why
         body = getContext()
                 .newBodyInvoker()
                 .withContexts(envEx, consFilter)
-                .withCallback(new Callback())
+                .withCallback(new Callback(settingsFile, backupFile, originalExisted, step.isCleanup(), tempFiles))
                 .start();
 
         return false;
     }
 
     /**
-     * Reads the config file from Config File Provider, expands the credentials and stores it in a file on the temp
-     * folder to use it with the maven wrapper script
+     * Reads the config file from Config File Provider, expands the credentials and writes it to settingsFile.
      *
      * @param settingsConfigId config file id from Config File Provider
-     * @param settingsFile path to write te content to
-     * @return the {@link FilePath} to the settings file
+     * @param settingsFile path to write the content to
+     * @param tempFiles list of temporary files created during content expansion
      * @throws AbortException in case of error
      */
-    private void settingsFromConfig(String settingsConfigId, FilePath settingsFile) throws AbortException {
+    private void settingsFromConfig(String settingsConfigId, FilePath settingsFile, ArrayList<String> tempFiles)
+            throws AbortException {
 
         Config config = ConfigFiles.getByIdOrNull(build, settingsConfigId);
         if (config == null) {
             throw new AbortException("Could not find the NPM config file id:" + settingsConfigId
                     + ". Make sure it exists on Managed Files");
         }
-        if (StringUtils.isBlank(config.content)) {
-            throw new AbortException(
-                    "Could not create NPM config file id:" + settingsConfigId + ". Content of the file is empty");
-        }
 
         console.println("Using settings config with name " + config.name);
 
         try {
-            if (settingsFile.exists()) {
-                console.println("A workscape local .npmrc already exists and will be overwrriten for the build.");
-            }
             ConfigProvider provider = config.getDescriptor();
-            ArrayList<String> tempFiles = new ArrayList<>();
             String fileContent = provider.supplyContent(config, build, ws, listener, tempFiles);
+            if (fileContent == null) {
+                fileContent = "";
+            }
 
             console.println("Writing .npmrc file: " + settingsFile);
 
@@ -175,16 +206,91 @@ class WithNPMStepExecution extends StepExecution {
     }
 
     /**
-     * Callback to cleanup tmp script after finishing the job
+     * Callback to cleanup temporary files and restore original config after finishing the job
      */
     private static class Callback extends BodyExecutionCallback.TailCall {
 
-        @Override
-        protected void finished(StepContext context) throws Exception {
-            // nothing
+        private static final long serialVersionUID = 1L;
+
+        private final FilePath settingsFile;
+        private final FilePath backupFile;
+        private final boolean originalExisted;
+        private final boolean cleanup;
+        private final ArrayList<String> tempFiles;
+
+        Callback(
+                FilePath settingsFile,
+                FilePath backupFile,
+                boolean originalExisted,
+                boolean cleanup,
+                ArrayList<String> tempFiles) {
+            this.settingsFile = settingsFile;
+            this.backupFile = backupFile;
+            this.originalExisted = originalExisted;
+            this.cleanup = cleanup;
+            this.tempFiles = tempFiles;
         }
 
-        private static final long serialVersionUID = 1L;
+        @Override
+        protected void finished(StepContext context) throws Exception {
+            TaskListener listener = context.get(TaskListener.class);
+            PrintStream console = listener != null ? listener.getLogger() : null;
+
+            if (tempFiles != null && settingsFile != null) {
+                for (String tempPath : tempFiles) {
+                    try {
+                        FilePath tf = new FilePath(settingsFile.getChannel(), tempPath);
+                        if (tf.exists()) {
+                            tf.delete();
+                        }
+                    } catch (Exception e) {
+                        if (console != null) {
+                            console.println(
+                                    "Warning: Could not remove temporary file " + tempPath + ": " + e.getMessage());
+                        }
+                    }
+                }
+            }
+
+            if (!cleanup) {
+                if (backupFile != null) {
+                    try {
+                        if (backupFile.exists()) {
+                            backupFile.delete();
+                        }
+                    } catch (Exception e) { // ignored
+                    }
+                }
+                return;
+            }
+
+            if (settingsFile == null) {
+                return;
+            }
+
+            try {
+                if (originalExisted) {
+                    if (backupFile != null && backupFile.exists()) {
+                        backupFile.copyTo(settingsFile);
+                        backupFile.delete();
+                        if (console != null) {
+                            console.println("Restored original .npmrc in " + settingsFile.getRemote());
+                        }
+                    }
+                } else {
+                    if (settingsFile.exists()) {
+                        settingsFile.delete();
+                        if (console != null) {
+                            console.println("Cleaned up temporary .npmrc from " + settingsFile.getRemote());
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                if (console != null) {
+                    console.println("Warning: Failed to cleanup .npmrc: " + e.getMessage());
+                }
+            }
+        }
     }
 
     @Override

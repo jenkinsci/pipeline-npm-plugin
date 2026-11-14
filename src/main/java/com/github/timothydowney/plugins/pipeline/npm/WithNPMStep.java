@@ -28,6 +28,8 @@ import org.kohsuke.stapler.DataBoundSetter;
 public class WithNPMStep extends Step {
 
     private String npmrcConfig;
+    private String path;
+    private boolean cleanup = true;
 
     @DataBoundConstructor
     public WithNPMStep() {}
@@ -39,6 +41,24 @@ public class WithNPMStep extends Step {
     @DataBoundSetter
     public void setNpmrcConfig(String npmrcConfig) {
         this.npmrcConfig = npmrcConfig;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    @DataBoundSetter
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public boolean isCleanup() {
+        return cleanup;
+    }
+
+    @DataBoundSetter
+    public void setCleanup(boolean cleanup) {
+        this.cleanup = cleanup;
     }
 
     @Override
